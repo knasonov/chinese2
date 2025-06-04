@@ -20,7 +20,7 @@ async function loadTokens() {
     });
 }
 
-function showResults() {
+async function showResults() {
     const words = Array.from(document.querySelectorAll('.word'));
     const known = [];
     const unknown = [];
@@ -33,7 +33,16 @@ function showResults() {
         }
     });
     const out = document.getElementById('output');
-    out.textContent = 'Known: ' + known.join(' ') + '\n\nUnknown: ' + unknown.join(' ');
+    out.textContent = 'Known: ' + known.join('') + '\n\nUnknown: ' + unknown.join('');
+    try {
+        await fetch('/update_words', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ known, unknown })
+        });
+    } catch (err) {
+        console.error('Failed to send results', err);
+    }
 }
 
 document.getElementById('show').addEventListener('click', showResults);
