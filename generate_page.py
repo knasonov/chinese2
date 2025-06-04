@@ -86,7 +86,7 @@ def generate_html(total: int, counts: list[tuple[str, int]]) -> str:
 
 
 def main() -> None:
-    total, counts = analyze_stories("story*.txt")
+    total, counts = analyze_stories("stories/story*.txt")
     html = generate_html(total, counts)
     with open("stats.html", "w", encoding="utf-8") as f:
         f.write(html)

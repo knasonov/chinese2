@@ -17,7 +17,7 @@ frequency.
 ## Generating a static page with Python
 
 If you prefer a single self-contained HTML file you can run
-`generate_page.py`. It analyzes all `story*.txt` files and writes `stats.html`
+`generate_page.py`. It analyzes all `stories/story*.txt` files and writes `stats.html`
 with the statistics embedded directly in the page:
 
 ```bash
