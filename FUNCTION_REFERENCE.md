@@ -84,9 +84,9 @@ This document lists the public Python functions in this repository and briefly e
 - `update_user_progress(known: list[str], unknown: list[str], db_path: str = "chinese_words.db") -> None`
 
   Updates the `user_words` table based on the selected words. Encounter counts
-  are increased and `known_probability` is recalculated from the total number of
-  interactions using `probability_from_interactions`. The `user_knows_word`
-  column is set to `1` for known words and `0` for unknown words.
+  are increased but probabilities are not recomputed automatically. Instead
+  `known_probability` is set to `1.10` for words marked as known and `0.50` for
+  words marked as unknown. The `user_knows_word` column is updated accordingly.
 
 - `probability_from_interactions(count: int) -> float`
 
@@ -97,4 +97,6 @@ This document lists the public Python functions in this repository and briefly e
 - `app`
 
   Flask application serving the selection page and providing the
-  `/update_words` endpoint to receive the user's choices.
+  `/update_words` endpoint to receive the user's choices. It also exposes a
+  `/recalculate` endpoint to recompute all probabilities from the stored
+  interaction counts.

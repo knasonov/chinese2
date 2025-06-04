@@ -12,4 +12,11 @@ async function loadStats() {
     });
 }
 
+async function recalc() {
+    await fetch('/recalculate', { method: 'POST' });
+    loadStats();
+}
+
+document.getElementById('recalc').addEventListener('click', recalc);
+
 loadStats();

@@ -50,6 +50,23 @@ def stats_data():
     return jsonify(data)
 
 
+@app.route("/recalculate", methods=["POST"])
+def recalculate_probabilities():
+    """Recompute known probabilities from the interaction counts."""
+    with sqlite3.connect(DB_PATH) as conn:
+        rows = conn.execute(
+            "SELECT simplified, number_in_texts FROM user_words"
+        ).fetchall()
+        for word, num in rows:
+            prob = probability_from_interactions(num)
+            conn.execute(
+                "UPDATE user_words SET known_probability = ? WHERE simplified = ?",
+                (prob, word),
+            )
+        conn.commit()
+    return jsonify({"status": "ok"})
+
+
 @app.route("/update_words", methods=["POST"])
 def update_words():
     data = request.get_json(force=True)
@@ -87,13 +104,14 @@ def update_user_progress(known: list[str], unknown: list[str], db_path: str = DB
             ).fetchone()
             if row is None:
                 continue
-            user_knows, _, num = row
+            user_knows, prob, num = row
             num += count
-            prob = probability_from_interactions(num)
             if word in known_set:
                 user_knows = 1
+                prob = 1.10
             elif word in unknown_set:
                 user_knows = 0
+                prob = 0.50
             conn.execute(
                 "UPDATE user_words SET user_knows_word = ?, known_probability = ?, number_in_texts = ? WHERE simplified = ?",
                 (user_knows, prob, num, word),
