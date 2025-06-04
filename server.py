@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections import Counter
 import json
 import sqlite3
+import re
+import math
 from flask import Flask, jsonify, request, send_from_directory
 
 DB_PATH = "chinese_words.db"
@@ -18,6 +20,24 @@ def index():
 @app.route("/tokens.json")
 def tokens():
     return send_from_directory(".", "tokens.json")
+
+
+@app.route("/unknown_words")
+def unknown_words():
+    with open("tokens.json", "r", encoding="utf-8") as f:
+        tokens = json.load(f)
+    chinese_re = re.compile(r"[\u4e00-\u9fff]+")
+    words = {t for t in tokens if chinese_re.search(t)}
+    if not words:
+        return jsonify([])
+    placeholders = ",".join(["?"] * len(words))
+    with sqlite3.connect(DB_PATH) as conn:
+        rows = conn.execute(
+            f"SELECT simplified, known_probability FROM user_words WHERE simplified IN ({placeholders})",
+            list(words),
+        ).fetchall()
+    unknown = [w for w, p in rows if p <= 0.30]
+    return jsonify(unknown)
 
 
 @app.route("/text_selection.js")
@@ -79,17 +99,22 @@ def update_words():
 def probability_from_interactions(count: int) -> float:
     """Return a knowledge probability based on how often the word was seen.
 
-    One encounter corresponds to ~1%% probability, 15 encounters to about 50%%
-    and 100 encounters reach roughly 95%%. Values in between are interpolated
-    linearly. Anything above 100 interactions is clamped at 95%%.
+    Uses a logistic curve that starts around 1% when the user first
+    encounters a word, reaches 50% after roughly 15 interactions and
+    slowly approaches 1. Probabilities above 95% are capped to avoid
+    absolute certainty.
     """
-    if count <= 1:
-        return 0.01
-    if count <= 15:
-        return 0.01 + (count - 1) * (0.5 - 0.01) / 14
-    if count >= 100:
+    k = 0.3
+    x0 = 15
+    l0 = 1 / (1 + math.exp(-k * (0 - x0)))
+    scale = (0.5 - 0.01) / (0.5 - l0)
+    base = 0.01 - scale * l0
+    p = base + scale / (1 + math.exp(-k * (count - x0)))
+    if p > 0.95:
         return 0.95
-    return 0.5 + (count - 15) * (0.95 - 0.5) / 85
+    if p < 0:
+        return 0.0
+    return p
 
 
 def update_user_progress(known: list[str], unknown: list[str], db_path: str = DB_PATH) -> None:

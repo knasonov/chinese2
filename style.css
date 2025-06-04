@@ -6,12 +6,30 @@ body {
 }
 
 .container {
-    max-width: 600px;
+    max-width: 900px;
     margin: auto;
     background-color: #ffffff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.layout {
+    display: flex;
+    gap: 20px;
+}
+
+#left {
+    flex: 1;
+}
+
+#right {
+    width: 250px;
+}
+
+#unknown-list {
+    list-style: none;
+    padding-left: 0;
 }
 
 #text {

@@ -6,11 +6,17 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Select Unknown Words</h1>
-        <div id="text"></div>
-        <button id="show">Show Results</button>
-        <pre id="output"></pre>
+    <div class="container layout">
+        <div id="left">
+            <h1>Select Unknown Words</h1>
+            <div id="text"></div>
+            <button id="show">Show Results</button>
+            <pre id="output"></pre>
+        </div>
+        <div id="right">
+            <h2>Words you probably don't know</h2>
+            <ul id="unknown-list"></ul>
+        </div>
     </div>
     <script src="text_selection.js"></script>
 </body>
