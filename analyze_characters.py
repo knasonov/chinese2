@@ -46,7 +46,7 @@ def write_json(total: int, sorted_counts: list[tuple[str, int]], path: str) -> N
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Analyze story character frequencies")
-    parser.add_argument('-p', '--pattern', default='story*.txt',
+    parser.add_argument('-p', '--pattern', default='stories/story*.txt',
                         help='Glob pattern for story files')
     parser.add_argument('-t', '--top', type=int, default=10,
                         help='Number of top characters to display')
