@@ -84,8 +84,15 @@ This document lists the public Python functions in this repository and briefly e
 - `update_user_progress(known: list[str], unknown: list[str], db_path: str = "chinese_words.db") -> None`
 
   Updates the `user_words` table based on the selected words. Encounter counts
-  are increased and `known_probability` is adjusted (+20% for known words,
-  halved for unknown words, always at least 1%).
+  are increased and `known_probability` is recalculated from the total number of
+  interactions using `probability_from_interactions`. The `user_knows_word`
+  column is set to `1` for known words and `0` for unknown words.
+
+- `probability_from_interactions(count: int) -> float`
+
+  Convert the number of times a word has been encountered into a probability of
+  being known. One encounter yields 1% probability, 15 encounters about 50% and
+  100 encounters about 95%.
 
 - `app`
 

@@ -40,7 +40,8 @@ def stats_data():
     with sqlite3.connect(DB_PATH) as conn:
         rows = conn.execute(
             "SELECT simplified, known_probability, number_in_texts "
-            "FROM user_words ORDER BY number_in_texts DESC, simplified LIMIT 100"
+            "FROM user_words WHERE number_in_texts > 0 "
+            "ORDER BY number_in_texts DESC, simplified"
         ).fetchall()
     data = [
         {"word": w, "probability": p, "interactions": n}
@@ -58,6 +59,22 @@ def update_words():
     return jsonify({"status": "ok"})
 
 
+def probability_from_interactions(count: int) -> float:
+    """Return a knowledge probability based on how often the word was seen.
+
+    One encounter corresponds to ~1%% probability, 15 encounters to about 50%%
+    and 100 encounters reach roughly 95%%. Values in between are interpolated
+    linearly. Anything above 100 interactions is clamped at 95%%.
+    """
+    if count <= 1:
+        return 0.01
+    if count <= 15:
+        return 0.01 + (count - 1) * (0.5 - 0.01) / 14
+    if count >= 100:
+        return 0.95
+    return 0.5 + (count - 15) * (0.95 - 0.5) / 85
+
+
 def update_user_progress(known: list[str], unknown: list[str], db_path: str = DB_PATH) -> None:
     counts = Counter(known + unknown)
     known_set = set(known)
@@ -70,20 +87,13 @@ def update_user_progress(known: list[str], unknown: list[str], db_path: str = DB
             ).fetchone()
             if row is None:
                 continue
-            user_knows, prob, num = row
+            user_knows, _, num = row
             num += count
-            if prob < 0.01:
-                prob = 0.01
+            prob = probability_from_interactions(num)
             if word in known_set:
                 user_knows = 1
-                prob *= 1.2
             elif word in unknown_set:
                 user_knows = 0
-                prob *= 0.5
-            if prob < 0.01:
-                prob = 0.01
-            if prob > 1:
-                prob = 1
             conn.execute(
                 "UPDATE user_words SET user_knows_word = ?, known_probability = ?, number_in_texts = ? WHERE simplified = ?",
                 (user_knows, prob, num, word),
