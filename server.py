@@ -25,6 +25,30 @@ def js_file():
     return send_from_directory(".", "text_selection.js")
 
 
+@app.route("/stats")
+def stats_page():
+    return send_from_directory(".", "stats.html")
+
+
+@app.route("/stats.js")
+def stats_js():
+    return send_from_directory(".", "stats.js")
+
+
+@app.route("/stats_data")
+def stats_data():
+    with sqlite3.connect(DB_PATH) as conn:
+        rows = conn.execute(
+            "SELECT simplified, known_probability, number_in_texts "
+            "FROM user_words ORDER BY number_in_texts DESC, simplified LIMIT 100"
+        ).fetchall()
+    data = [
+        {"word": w, "probability": p, "interactions": n}
+        for w, p, n in rows
+    ]
+    return jsonify(data)
+
+
 @app.route("/update_words", methods=["POST"])
 def update_words():
     data = request.get_json(force=True)

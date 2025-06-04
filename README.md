@@ -31,3 +31,10 @@ This writes `tokens.json` which is loaded by `text_selection.html`.
 Run `python server.py` and open `http://localhost:5000` to mark unknown
 words in the browser. Click words to highlight them and press
 **Show Results** to store the results in the database.
+
+## Viewing learning statistics
+
+While the server is running, open `http://localhost:5000/stats` to see a table
+of all words that have been encountered. The page lists each word together with
+its current probability of being known and how many times it occurred in the
+texts.
