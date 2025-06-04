@@ -37,4 +37,5 @@ words in the browser. Click words to highlight them and press
 While the server is running, open `http://localhost:5000/stats` to see a table
 of all words that have been encountered. The page lists each word together with
 its current probability of being known and how many times it occurred in the
-texts.
+texts. A **Recalculate based on the number of interactions** button lets you
+recompute all probabilities from the stored interaction counts.
