@@ -26,9 +26,11 @@ async function loadUnknownWords() {
     const list = document.getElementById('unknown-list');
     list.innerHTML = '';
     words.forEach(w => {
-        const li = document.createElement('li');
-        li.textContent = w;
-        list.append(li);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${w.word}</td>` +
+            `<td>${w.pinyin}</td>` +
+            `<td>${w.meaning}</td>`;
+        list.append(tr);
     });
 }
 

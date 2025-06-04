@@ -37,7 +37,24 @@ def unknown_words():
             list(words),
         ).fetchall()
     unknown = [w for w, p in rows if p <= 0.30]
-    return jsonify(unknown)
+    if not unknown:
+        return jsonify([])
+
+    placeholders = ",".join(["?"] * len(unknown))
+    with sqlite3.connect(DB_PATH) as conn:
+        details = conn.execute(
+            f"SELECT simplified, pinyin, meaning FROM words WHERE simplified IN ({placeholders})",
+            unknown,
+        ).fetchall()
+
+    result = []
+    for word, pinyin, meaning in details:
+        first = meaning.split(';')[0].split(',')[0].strip().rstrip('.')
+        result.append({"word": word, "pinyin": pinyin, "meaning": first})
+
+    # preserve original order
+    result.sort(key=lambda x: unknown.index(x["word"]))
+    return jsonify(result)
 
 
 @app.route("/text_selection.js")
