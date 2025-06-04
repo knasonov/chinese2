@@ -12,6 +12,8 @@ def find_mismatched_words(
 ) -> List[Tuple[str, int, int]]:
     """Return words frequent in general texts but rare for the user.
 
+    Words the user has never encountered are ignored.
+
     Parameters
     ----------
     db_path:
@@ -51,6 +53,8 @@ def find_mismatched_words(
     discrepancies: list[tuple[str, int, int, float]] = []
     for word, freq in general:
         count = user_counts.get(word, 0)
+        if count == 0:
+            continue
         score = freq / (count + 1)
         discrepancies.append((word, freq, count, score))
 
@@ -60,7 +64,7 @@ def find_mismatched_words(
 
 
 def print_mismatched_words() -> None:
-    """Print 50 high-frequency words missing from the user's texts."""
+    """Print 50 high-frequency words underrepresented in the user's texts."""
     results = find_mismatched_words()
     for word, gen_freq, user_count in results:
         print(f"{word}\tGeneral: {gen_freq}\tUser: {user_count}")
