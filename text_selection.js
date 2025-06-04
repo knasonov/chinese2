@@ -20,6 +20,18 @@ async function loadTokens() {
     });
 }
 
+async function loadUnknownWords() {
+    const res = await fetch('/unknown_words');
+    const words = await res.json();
+    const list = document.getElementById('unknown-list');
+    list.innerHTML = '';
+    words.forEach(w => {
+        const li = document.createElement('li');
+        li.textContent = w;
+        list.append(li);
+    });
+}
+
 async function showResults() {
     const words = Array.from(document.querySelectorAll('.word'));
     const known = [];
@@ -47,3 +59,4 @@ async function showResults() {
 
 document.getElementById('show').addEventListener('click', showResults);
 loadTokens();
+loadUnknownWords();
