@@ -25,3 +25,16 @@ python generate_page.py
 ```
 
 Open `stats.html` in a browser after running the command.
+
+## Vocabulary database
+
+`import_words.py` converts the Excel word list into an SQLite database. Run it
+with Python (requires `pandas`):
+
+```bash
+python import_words.py
+```
+
+This creates `chinese_words.db` containing two tables: `words` with the
+vocabulary data and `user_words` for tracking individual progress. See
+`DATABASE.md` for a complete description of the schema.
