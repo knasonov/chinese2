@@ -27,4 +27,7 @@ Generate a list of tokens from one of the sample stories and open the demo page:
 python generate_tokens.py stories/story1.txt
 ```
 
-This writes `tokens.json` which is loaded by `text_selection.html`. Open the page in a browser to mark unknown words. Click words to highlight them and press **Show Results** to print the known and unknown lists.
+This writes `tokens.json` which is loaded by `text_selection.html`.
+Run `python server.py` and open `http://localhost:5000` to mark unknown
+words in the browser. Click words to highlight them and press
+**Show Results** to store the results in the database.

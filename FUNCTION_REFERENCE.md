@@ -78,3 +78,16 @@ This document lists the public Python functions in this repository and briefly e
   Segments a story with `segment_text` and writes the tokens to a JSON
   file. The output is consumed by `text_selection.html` for marking
   known and unknown words.
+
+## server.py
+
+- `update_user_progress(known: list[str], unknown: list[str], db_path: str = "chinese_words.db") -> None`
+
+  Updates the `user_words` table based on the selected words. Encounter counts
+  are increased and `known_probability` is adjusted (+20% for known words,
+  halved for unknown words, always at least 1%).
+
+- `app`
+
+  Flask application serving the selection page and providing the
+  `/update_words` endpoint to receive the user's choices.
