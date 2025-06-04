@@ -70,3 +70,11 @@ This document lists the public Python functions in this repository and briefly e
   Convenience wrapper that prints the top discrepancies from `find_mismatched_words`.
 
 
+
+## generate_tokens.py
+
+- `main() -> None`
+
+  Segments a story with `segment_text` and writes the tokens to a JSON
+  file. The output is consumed by `text_selection.html` for marking
+  known and unknown words.
