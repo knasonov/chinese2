@@ -75,6 +75,48 @@ def stats_js():
     return send_from_directory(".", "stats.js")
 
 
+@app.route("/flashcard")
+def flashcard_page():
+    return send_from_directory(".", "flashcard.html")
+
+
+@app.route("/flashcard.js")
+def flashcard_js():
+    return send_from_directory(".", "flashcard.js")
+
+
+@app.route("/next_word")
+def next_word():
+    """Return the next flashcard word ordered by frequency."""
+    offset = int(request.args.get("offset", 0))
+    with sqlite3.connect(DB_PATH) as conn:
+        row = conn.execute(
+            "SELECT w.simplified, w.pinyin, w.meaning "
+            "FROM words AS w JOIN user_words AS u ON w.simplified = u.simplified "
+            "WHERE u.known_probability < 0.7 "
+            "ORDER BY w.frequency LIMIT 1 OFFSET ?",
+            (offset,),
+        ).fetchone()
+    if not row:
+        return jsonify({})
+    return jsonify({"word": row[0], "pinyin": row[1], "meaning": row[2]})
+
+
+@app.route("/record_flashcard", methods=["POST"])
+def record_flashcard():
+    """Record the user's flashcard response."""
+    data = request.get_json(force=True)
+    word = data.get("word")
+    known = data.get("known")
+    if not word:
+        return jsonify({"status": "error", "msg": "missing word"})
+    flag = 1 if known else 0
+    with sqlite3.connect(DB_PATH) as conn:
+        record_interaction(conn, word, "flashcard", flag)
+        conn.commit()
+    return jsonify({"status": "ok"})
+
+
 @app.route("/stats_data")
 def stats_data():
     """Return basic statistics derived from interaction logs."""
