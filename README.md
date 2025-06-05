@@ -31,7 +31,9 @@ python generate_tokens.py stories/story1.txt
 This writes `tokens.json` which is loaded by `text_selection.html`.
 Run `python server.py` and open `http://localhost:5000` to mark unknown
 words in the browser. Click words to highlight them and press
-**Show Results** to store the results in the database.
+**Show Results** to record your interaction with each word. The
+`user_words` table is no longer modified directly; instead every
+interaction is stored in `word_interactions` with a timestamp.
 
 ## Viewing learning statistics
 
@@ -40,3 +42,8 @@ of all words that have been encountered. The page lists each word together with
 its current probability of being known and how many times it occurred in the
 texts. A **Recalculate based on the number of interactions** button lets you
 recompute all probabilities from the stored interaction counts.
+
+## Inspecting the database
+
+While the server is running, open `http://localhost:5000/database` to see the
+structure of each table and browse their contents.

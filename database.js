@@ -4,14 +4,30 @@ async function loadSchema() {
     const container = document.getElementById('schema');
     container.innerHTML = '';
     Object.entries(data).forEach(([table, columns]) => {
-        const div = document.createElement('div');
+        const section = document.createElement('section');
+        const heading = document.createElement('h3');
+        heading.textContent = table;
+        section.append(heading);
+
+        const colTable = document.createElement('table');
+        const thead = document.createElement('thead');
+        thead.innerHTML = '<tr><th>Column</th><th>Type</th></tr>';
+        const tbody = document.createElement('tbody');
+        columns.forEach(c => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${c.name}</td><td>${c.type}</td>`;
+            tbody.append(tr);
+        });
+        colTable.append(thead);
+        colTable.append(tbody);
+        section.append(colTable);
+
         const btn = document.createElement('button');
         btn.textContent = `Show ${table} data`;
         btn.addEventListener('click', () => loadTable(table));
-        const fields = columns.map(c => `${c.name} (${c.type})`).join(', ');
-        div.innerHTML = `<h3>${table}</h3><p>${fields}</p>`;
-        div.append(btn);
-        container.append(div);
+        section.append(btn);
+
+        container.append(section);
     });
 }
 

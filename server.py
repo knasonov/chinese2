@@ -76,15 +76,19 @@ def stats_js():
 
 @app.route("/stats_data")
 def stats_data():
+    """Return basic statistics derived from interaction logs."""
     with sqlite3.connect(DB_PATH) as conn:
         rows = conn.execute(
-            "SELECT simplified, known_probability, number_in_texts "
-            "FROM user_words WHERE number_in_texts > 0 "
-            "ORDER BY number_in_texts DESC, simplified"
+            "SELECT simplified, COUNT(*) FROM word_interactions "
+            "GROUP BY simplified ORDER BY COUNT(*) DESC, simplified"
         ).fetchall()
     data = [
-        {"word": w, "probability": p, "interactions": n}
-        for w, p, n in rows
+        {
+            "word": word,
+            "probability": probability_from_interactions(count),
+            "interactions": count,
+        }
+        for word, count in rows
     ]
     return jsonify(data)
 
@@ -184,29 +188,19 @@ def record_interaction(conn: sqlite3.Connection, word: str, interaction: str, kn
 
 
 def update_user_progress(known: list[str], unknown: list[str], db_path: str = DB_PATH) -> None:
+    """Record reading interactions without modifying user progress directly."""
     counts = Counter(known + unknown)
     known_set = set(known)
     unknown_set = set(unknown)
     with sqlite3.connect(db_path) as conn:
         for word, count in counts.items():
-            row = conn.execute(
-                "SELECT user_knows_word, known_probability, number_in_texts FROM user_words WHERE simplified = ?",
+            # ensure the word exists in the vocabulary list
+            exists = conn.execute(
+                "SELECT 1 FROM user_words WHERE simplified = ?",
                 (word,),
             ).fetchone()
-            if row is None:
+            if not exists:
                 continue
-            user_knows, prob, num = row
-            num += count
-            if word in known_set:
-                user_knows = 1
-                prob = 1.10
-            elif word in unknown_set:
-                user_knows = 0
-                prob = 0.50
-            conn.execute(
-                "UPDATE user_words SET user_knows_word = ?, known_probability = ?, number_in_texts = ? WHERE simplified = ?",
-                (user_knows, prob, num, word),
-            )
             interaction = "read_known" if word in known_set else "read_unknown"
             flag = 1 if word in known_set else 0
             for _ in range(count):
