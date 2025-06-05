@@ -8,12 +8,13 @@
 <body>
     <div class="container" id="card">
         <h1 id="word"></h1>
+        <hr id="divider">
         <div id="pinyin"></div>
         <div id="meaning" style="display:none;"></div>
-        <button id="reveal">Reveal Translation (Space)</button>
+        <button id="reveal" class="btn">Reveal Translation (Space)</button>
         <div id="answer" style="display:none; margin-top:1em;">
-            <button id="know">I know this word (1)</button>
-            <button id="dontknow">I don't know this word (2)</button>
+            <button id="right" class="btn btn-right">Right</button>
+            <button id="wrong" class="btn btn-wrong">Wrong</button>
         </div>
     </div>
     <script src="flashcard.js"></script>
