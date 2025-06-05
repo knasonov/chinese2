@@ -37,8 +37,8 @@ async function record(known) {
 }
 
 document.getElementById('reveal').addEventListener('click', reveal);
-document.getElementById('know').addEventListener('click', () => record(true));
-document.getElementById('dontknow').addEventListener('click', () => record(false));
+document.getElementById('right').addEventListener('click', () => record(true));
+document.getElementById('wrong').addEventListener('click', () => record(false));
 
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
