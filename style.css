@@ -35,12 +35,12 @@ body {
 #text {
     padding: 20px;
     margin: 10px auto;
-    width: 80%;
+    width: 90%;
     max-width: 900px;
     background-color: #ffffff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     font-family: 'KaiTi', 'STKaiti', 'DFKai-SB', 'SimKai', serif;
-    font-size: 42px;
+    font-size: 34px;
     line-height: 1.4;
     margin-bottom: 1em;
 }
