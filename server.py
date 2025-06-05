@@ -7,6 +7,7 @@ import re
 import math
 import time
 from flask import Flask, jsonify, request, send_from_directory
+from algo import WordPredictor
 
 
 DB_PATH = "chinese_words.db"
@@ -79,29 +80,44 @@ def stats_data():
     """Return basic statistics derived from interaction logs."""
     with sqlite3.connect(DB_PATH) as conn:
         rows = conn.execute(
-            "SELECT simplified, COUNT(*) FROM word_interactions "
-            "GROUP BY simplified ORDER BY COUNT(*) DESC, simplified"
+            "SELECT w.simplified, u.known_probability, COUNT(*) "
+            "FROM word_interactions AS w "
+            "JOIN user_words AS u ON w.simplified = u.simplified "
+            "GROUP BY w.simplified ORDER BY COUNT(*) DESC, w.simplified"
         ).fetchall()
     data = [
         {
             "word": word,
-            "probability": probability_from_interactions(count),
+            "probability": prob,
             "interactions": count,
         }
-        for word, count in rows
+        for word, prob, count in rows
     ]
     return jsonify(data)
 
 
 @app.route("/recalculate", methods=["POST"])
 def recalculate_probabilities():
-    """Recompute known probabilities from the interaction counts."""
+    """Recompute known probabilities using the WordPredictor algorithm."""
     with sqlite3.connect(DB_PATH) as conn:
+        conn.row_factory = sqlite3.Row
         rows = conn.execute(
-            "SELECT simplified, number_in_texts FROM user_words"
+            "SELECT simplified, interaction, known, timestamp "
+            "FROM word_interactions ORDER BY simplified, timestamp"
         ).fetchall()
-        for word, num in rows:
-            prob = probability_from_interactions(num)
+
+        events: dict[str, list[sqlite3.Row]] = {}
+        for row in rows:
+            events.setdefault(row["simplified"], []).append(row)
+
+        now = time.time()
+        for word, evs in events.items():
+            wp = WordPredictor()
+            for ev in evs:
+                mode = ev["interaction"].split("_")[0]
+                outcome = int(ev["known"] or 0)
+                wp.update(mode, outcome, ev["timestamp"])
+            prob = float(wp.probability(now))
             conn.execute(
                 "UPDATE user_words SET known_probability = ? WHERE simplified = ?",
                 (prob, word),
