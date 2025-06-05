@@ -1,6 +1,10 @@
 async function loadTokens() {
-    const res = await fetch('tokens.json');
-    const tokens = await res.json();
+    const [tokenRes, bpmfRes] = await Promise.all([
+        fetch('tokens.json'),
+        fetch('/bopomofo_mapping')
+    ]);
+    const tokens = await tokenRes.json();
+    const bpmfMap = await bpmfRes.json();
     const container = document.getElementById('text');
     const chineseRE = /[\u4e00-\u9fff]/;
     tokens.forEach(t => {
@@ -9,9 +13,28 @@ async function loadTokens() {
         } else if (chineseRE.test(t)) {
             const span = document.createElement('span');
             span.textContent = t;
+            span.dataset.original = t;
+            if (bpmfMap[t]) {
+                span.dataset.bpmf = bpmfMap[t];
+            }
             span.classList.add('word');
             span.addEventListener('click', () => {
                 span.classList.toggle('unknown');
+                const bpmf = span.dataset.bpmf;
+                if (!bpmf) return;
+                if (span.dataset.showing === 'true') {
+                    span.textContent = span.dataset.original;
+                    span.dataset.showing = 'false';
+                } else {
+                    const chars = Array.from(span.dataset.original);
+                    const readings = bpmf.split(' ');
+                    const html = chars.map((c, i) => {
+                        const r = readings[i] || '';
+                        return `<span class="ruby-char">${c}<span class="rt-bpmf">${r}</span></span>`;
+                    }).join('');
+                    span.innerHTML = html;
+                    span.dataset.showing = 'true';
+                }
             });
             container.append(span);
         } else {
@@ -39,7 +62,7 @@ async function showResults() {
     const known = [];
     const unknown = [];
     words.forEach(span => {
-        const w = span.textContent;
+        const w = span.dataset.original || span.textContent;
         if (span.classList.contains('unknown')) {
             unknown.push(w);
         } else {
