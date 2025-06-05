@@ -6,7 +6,7 @@ make it easy to query vocabulary data and track personal learning progress.
 
 ## Schema
 
-The resulting database contains two tables:
+The resulting database contains three tables:
 
 ### `words`
 - `simplified` – the simplified Chinese form of the word
@@ -25,6 +25,16 @@ All rows come directly from the Excel spreadsheet.
 
 Each word from the `words` table is automatically inserted into this table with
 default values so that learning progress can be tracked immediately.
+
+### `word_interactions`
+- `id` – auto-incrementing unique row identifier
+- `simplified` – references a word in the `words` table
+- `interaction` – short string describing the type of interaction
+- `known` – `0` or `1` if the user indicated knowledge (may be `NULL`)
+- `timestamp` – Unix epoch time (seconds)
+
+Every encounter with a word is recorded in this table. It allows analysing the
+time between reviews and supports future interaction types beyond reading.
 
 ## Usage
 

@@ -38,6 +38,19 @@ def import_excel(excel_path: str, db_path: str = DEFAULT_DB_PATH) -> None:
             )
             """
         )
+        # table recording every single interaction with a word
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS word_interactions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                simplified TEXT NOT NULL,
+                interaction TEXT NOT NULL,
+                known INTEGER,
+                timestamp INTEGER NOT NULL,
+                FOREIGN KEY(simplified) REFERENCES words(simplified)
+            )
+            """
+        )
         # prepopulate user_words with the word list if not already present
         existing = {
             row[0]

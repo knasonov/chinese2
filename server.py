@@ -5,6 +5,7 @@ import json
 import sqlite3
 import re
 import math
+import time
 from flask import Flask, jsonify, request, send_from_directory
 
 
@@ -173,6 +174,15 @@ def probability_from_interactions(count: int) -> float:
     return p
 
 
+def record_interaction(conn: sqlite3.Connection, word: str, interaction: str, known: int | None) -> None:
+    """Insert a single interaction entry into the database."""
+    ts = int(time.time())
+    conn.execute(
+        "INSERT INTO word_interactions(simplified, interaction, known, timestamp) VALUES (?,?,?,?)",
+        (word, interaction, known, ts),
+    )
+
+
 def update_user_progress(known: list[str], unknown: list[str], db_path: str = DB_PATH) -> None:
     counts = Counter(known + unknown)
     known_set = set(known)
@@ -197,6 +207,10 @@ def update_user_progress(known: list[str], unknown: list[str], db_path: str = DB
                 "UPDATE user_words SET user_knows_word = ?, known_probability = ?, number_in_texts = ? WHERE simplified = ?",
                 (user_knows, prob, num, word),
             )
+            interaction = "read_known" if word in known_set else "read_unknown"
+            flag = 1 if word in known_set else 0
+            for _ in range(count):
+                record_interaction(conn, word, interaction, flag)
         conn.commit()
 
 
