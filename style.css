@@ -170,3 +170,37 @@ th {
 #card.flip {
     animation: flip 0.6s ease;
 }
+
+/* Index page styling */
+#index-page {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+#buttons {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.front-btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    background-color: #8bbdd9;
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.1em;
+    transition: background-color 0.2s;
+}
+
+.front-btn:hover {
+    background-color: #6aa5c2;
+}
+
+#decor {
+    margin-top: 50px;
+    font-size: 2em;
+    opacity: 0.3;
+}
