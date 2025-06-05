@@ -20,20 +20,23 @@ async function loadTokens() {
             span.classList.add('word');
             span.addEventListener('click', () => {
                 span.classList.toggle('unknown');
+            });
+            span.addEventListener('mouseenter', () => {
                 const bpmf = span.dataset.bpmf;
-                if (!bpmf) return;
+                if (!bpmf || span.dataset.showing === 'true') return;
+                const chars = Array.from(span.dataset.original);
+                const readings = bpmf.split(' ');
+                const html = chars.map((c, i) => {
+                    const r = readings[i] || '';
+                    return `<span class="ruby-char">${c}<span class="rt-bpmf">${r}</span></span>`;
+                }).join('');
+                span.innerHTML = html;
+                span.dataset.showing = 'true';
+            });
+            span.addEventListener('mouseleave', () => {
                 if (span.dataset.showing === 'true') {
                     span.textContent = span.dataset.original;
                     span.dataset.showing = 'false';
-                } else {
-                    const chars = Array.from(span.dataset.original);
-                    const readings = bpmf.split(' ');
-                    const html = chars.map((c, i) => {
-                        const r = readings[i] || '';
-                        return `<span class="ruby-char">${c}<span class="rt-bpmf">${r}</span></span>`;
-                    }).join('');
-                    span.innerHTML = html;
-                    span.dataset.showing = 'true';
                 }
             });
             container.append(span);
