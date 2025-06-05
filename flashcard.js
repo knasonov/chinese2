@@ -2,6 +2,10 @@ let index = 0;
 let currentWord = null;
 
 async function loadWord() {
+    const card = document.getElementById('card');
+    card.classList.add('flip');
+    setTimeout(() => card.classList.remove('flip'), 600);
+
     const res = await fetch(`/next_word?offset=${index}`);
     const data = await res.json();
     if (!data.word) {
