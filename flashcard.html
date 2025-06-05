@@ -7,14 +7,19 @@
 </head>
 <body>
     <div class="container" id="card">
-        <h1 id="word"></h1>
+        <div id="front">
+            <h1 id="word"></h1>
+            <div id="pinyin"></div>
+            <button id="reveal" class="btn">Reveal Translation (Space)</button>
+        </div>
         <hr id="divider">
-        <div id="pinyin"></div>
-        <div id="meaning" style="display:none;"></div>
-        <button id="reveal" class="btn">Reveal Translation (Space)</button>
-        <div id="answer" style="display:none; margin-top:1em;">
-            <button id="right" class="btn btn-right">Right</button>
-            <button id="wrong" class="btn btn-wrong">Wrong</button>
+        <div id="back">
+            <div id="meaning" style="display:none;"></div>
+            <hr id="button-divider" style="display:none;">
+            <div id="answer" style="display:none; margin-top:1em;">
+                <button id="right" class="btn btn-right">Right</button>
+                <button id="wrong" class="btn btn-wrong">Wrong</button>
+            </div>
         </div>
     </div>
     <script src="flashcard.js"></script>
