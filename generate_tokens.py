@@ -5,7 +5,7 @@ from search_words import load_words, segment_text
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate token list for a story")
-    parser.add_argument("path", nargs="?", default="stories/story1.txt", help="Story file")
+    parser.add_argument("path", nargs="?", default="stories/story3.txt", help="Story file")
     parser.add_argument("-o", "--out", default="tokens.json", help="Output JSON file")
     parser.add_argument("-d", "--db", default="chinese_words.db", help="Path to words database")
     args = parser.parse_args()

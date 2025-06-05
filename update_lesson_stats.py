@@ -45,12 +45,12 @@ def fetch_statistics(db_path: str) -> list[tuple[str, int]]:
 
 
 def main() -> None:
-    counts = count_lesson_words(LESSON_DIR, DB_PATH)
-    update_database(counts, DB_PATH)
+    #counts = count_lesson_words(LESSON_DIR, DB_PATH)
+    #update_database(counts, DB_PATH)
     stats = fetch_statistics(DB_PATH)
     total = sum(count for _, count in stats)
     print(f"Word encounter statistics for {USER}:")
-    for word, count in stats[:20]:
+    for word, count in stats[:500]:
         print(f"{word}: {count}")
     print(f"Total word occurrences: {total}")
 
