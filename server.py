@@ -7,6 +7,7 @@ import re
 import math
 from flask import Flask, jsonify, request, send_from_directory
 
+
 DB_PATH = "chinese_words.db"
 
 app = Flask(__name__, static_url_path="", static_folder=".")
@@ -111,6 +112,44 @@ def update_words():
     unknown = data.get("unknown", [])
     update_user_progress(known, unknown, DB_PATH)
     return jsonify({"status": "ok"})
+
+
+# ---- Database viewer endpoints ----
+
+@app.route("/database")
+def database_page():
+    return send_from_directory(".", "database.html")
+
+
+@app.route("/database.js")
+def database_js():
+    return send_from_directory(".", "database.js")
+
+
+@app.route("/db_schema")
+def db_schema():
+    """Return list of tables and their columns."""
+    schema = {}
+    with sqlite3.connect(DB_PATH) as conn:
+        tables = conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
+        ).fetchall()
+        for (name,) in tables:
+            cols = conn.execute(f"PRAGMA table_info({name})").fetchall()
+            schema[name] = [{"name": c[1], "type": c[2]} for c in cols]
+    return jsonify(schema)
+
+
+@app.route("/table/<name>")
+def table_data(name: str):
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.row_factory = sqlite3.Row
+        try:
+            rows = conn.execute(f"SELECT * FROM {name}").fetchall()
+        except sqlite3.Error:
+            return jsonify([])
+        data = [dict(row) for row in rows]
+    return jsonify(data)
 
 
 def probability_from_interactions(count: int) -> float:
