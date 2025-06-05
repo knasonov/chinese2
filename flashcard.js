@@ -18,11 +18,13 @@ async function loadWord() {
     document.getElementById('meaning').textContent = data.meaning;
     document.getElementById('meaning').style.display = 'none';
     document.getElementById('answer').style.display = 'none';
+    document.getElementById('button-divider').style.display = 'none';
 }
 
 function reveal() {
     document.getElementById('meaning').style.display = 'block';
-    document.getElementById('answer').style.display = 'block';
+    document.getElementById('button-divider').style.display = 'block';
+    document.getElementById('answer').style.display = 'flex';
 }
 
 async function record(known) {
