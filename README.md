@@ -28,8 +28,8 @@ Generate a list of tokens from one of the sample stories and open the demo page:
 python generate_tokens.py stories/story1.txt
 ```
 
-This writes `tokens.json` which is loaded by `text_selection.html`.
-Run `python server.py` and open `http://localhost:5000` to mark unknown
+This writes `tokens.json` which is loaded by `text.html`.
+Run `python server.py` and open `http://localhost:5000/text` to mark unknown
 words in the browser. Click words to highlight them and press
 **Show Results** to record your interaction with each word. The
 `user_words` table is no longer modified directly; instead every

@@ -76,7 +76,7 @@ This document lists the public Python functions in this repository and briefly e
 - `main() -> None`
 
   Segments a story with `segment_text` and writes the tokens to a JSON
-  file. The output is consumed by `text_selection.html` for marking
+  file. The output is consumed by `text.html` for marking
   known and unknown words.
 
 ## server.py
