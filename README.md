@@ -11,8 +11,9 @@ with Python (requires `pandas`):
 python import_words.py
 ```
 
-This creates `chinese_words.db` containing two tables: `words` with the
-vocabulary data and `user_words` for tracking individual progress. See
+This creates `chinese_words.db` containing three tables: `words` with the
+vocabulary data, `user_words` for tracking individual progress and
+`word_interactions` which logs every encounter with a word. See
 `DATABASE.md` for a complete description of the schema.
 
 ## Function Reference

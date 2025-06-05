@@ -83,16 +83,21 @@ This document lists the public Python functions in this repository and briefly e
 
 - `update_user_progress(known: list[str], unknown: list[str], db_path: str = "chinese_words.db") -> None`
 
-  Updates the `user_words` table based on the selected words. Encounter counts
-  are increased but probabilities are not recomputed automatically. Instead
-  `known_probability` is set to `1.10` for words marked as known and `0.50` for
-  words marked as unknown. The `user_knows_word` column is updated accordingly.
+  Updates the `user_words` table and records every interaction in the
+  `word_interactions` table. Encounter counts are increased but probabilities
+  are not recomputed automatically. Instead `known_probability` is set to `1.10`
+  for words marked as known and `0.50` for words marked as unknown. The
+  `user_knows_word` column is updated accordingly.
 
 - `probability_from_interactions(count: int) -> float`
 
   Convert the number of times a word has been encountered into a probability of
   being known. One encounter yields 1% probability, 15 encounters about 50% and
   100 encounters about 95%.
+
+- `record_interaction(conn: sqlite3.Connection, word: str, interaction: str, known: int | None) -> None`
+
+  Inserts a single row into `word_interactions` with the current timestamp.
 
 - `app`
 
