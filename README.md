@@ -4,11 +4,11 @@ The repository for testing Codex on my Chinese project
 
 ## Vocabulary database
 
-`import_words.py` converts the Excel word list into an SQLite database. Run it
-with Python (requires `pandas`):
+`initial.py` sets up the SQLite database and preloads it with the lesson
+statistics. Run it with Python (requires `pandas`):
 
 ```bash
-python import_words.py
+python initial.py
 ```
 
 This creates `chinese_words.db` containing three tables: `words` with the

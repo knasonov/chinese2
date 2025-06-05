@@ -105,3 +105,25 @@ This document lists the public Python functions in this repository and briefly e
   `/update_words` endpoint to receive the user's choices. It also exposes a
   `/recalculate` endpoint to recompute all probabilities from the stored
   interaction counts.
+
+## initial.py
+
+- `setup_database(excel_path: str = "bopomofo_translated.xlsx", db_path: str = "chinese_words.db") -> None`
+
+  Create the SQLite database from the Excel word list.
+
+- `count_lesson_words(lesson_dir: str = "lessons", db_path: str = "chinese_words.db") -> Counter`
+
+  Return a `Counter` with the number of times each word occurs across all lesson texts.
+
+- `update_lesson_statistics(db_path: str = "chinese_words.db", lesson_dir: str = "lessons") -> None`
+
+  Store the lesson word counts in the `user_words` table.
+
+- `upload_lesson_interactions(db_path: str = "chinese_words.db", lesson_dir: str = "lessons") -> None`
+
+  Record interactions for every word in the lesson texts as if the user had read them.
+
+- `main() -> None`
+
+  Execute the full initialisation workflow: create the database, populate statistics and log lesson interactions.
