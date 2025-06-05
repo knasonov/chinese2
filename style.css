@@ -33,9 +33,10 @@ body {
 }
 
 #text {
-    font-size: 1.2em;
-    line-height: 1.8;
+    font-size: 1.5em;
+    line-height: 2;
     margin-bottom: 1em;
+    font-family: "Noto Serif TC", "KaiTi", serif;
 }
 
 .word {
@@ -203,4 +204,18 @@ th {
     margin-top: 50px;
     font-size: 2em;
     opacity: 0.3;
+}
+
+.ruby-char {
+    display: inline-flex;
+    align-items: center;
+}
+
+.rt-bpmf {
+    color: red;
+    font-size: 0.6em;
+    line-height: 1;
+    margin-left: 2px;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
 }

@@ -30,6 +30,25 @@ def tokens():
     return send_from_directory(".", "tokens.json")
 
 
+@app.route("/bopomofo_mapping")
+def bopomofo_mapping():
+    """Return a mapping from words in tokens.json to their bopomofo."""
+    with open("tokens.json", "r", encoding="utf-8") as f:
+        tokens = json.load(f)
+    chinese_re = re.compile(r"[\u4e00-\u9fff]+")
+    words = {t for t in tokens if chinese_re.search(t)}
+    if not words:
+        return jsonify({})
+    placeholders = ",".join(["?"] * len(words))
+    with sqlite3.connect(DB_PATH) as conn:
+        rows = conn.execute(
+            f"SELECT simplified, bopomofo FROM words WHERE simplified IN ({placeholders})",
+            list(words),
+        ).fetchall()
+    mapping = {w: b for w, b in rows}
+    return jsonify(mapping)
+
+
 @app.route("/unknown_words")
 def unknown_words():
     with open("tokens.json", "r", encoding="utf-8") as f:
