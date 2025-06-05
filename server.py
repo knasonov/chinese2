@@ -17,7 +17,12 @@ app = Flask(__name__, static_url_path="", static_folder=".")
 
 @app.route("/")
 def index():
-    return send_from_directory(".", "text_selection.html")
+    return send_from_directory(".", "index.html")
+
+
+@app.route("/text")
+def text_page():
+    return send_from_directory(".", "text.html")
 
 
 @app.route("/tokens.json")
