@@ -45,6 +45,13 @@ body {
     margin-bottom: 1em;
 }
 
+#nav {
+    margin-bottom: 1em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .word {
     cursor: pointer;
     padding: 0;

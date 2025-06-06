@@ -1,11 +1,15 @@
-async function loadTokens() {
+let stories = [];
+let currentIndex = 0;
+
+async function loadTokens(name) {
     const [tokenRes, bpmfRes] = await Promise.all([
-        fetch('tokens.json'),
-        fetch('/bopomofo_mapping')
+        fetch(`/story_tokens/${name}`),
+        fetch(`/bopomofo_mapping/${name}`)
     ]);
     const tokens = await tokenRes.json();
     const bpmfMap = await bpmfRes.json();
     const container = document.getElementById('text');
+    container.innerHTML = '';
     const chineseRE = /[\u4e00-\u9fff]/;
     tokens.forEach(t => {
         if (t === '\n') {
@@ -46,8 +50,8 @@ async function loadTokens() {
     });
 }
 
-async function loadUnknownWords() {
-    const res = await fetch('/unknown_words');
+async function loadUnknownWords(name) {
+    const res = await fetch(`/unknown_words/${name}`);
     const words = await res.json();
     const list = document.getElementById('unknown-list');
     list.innerHTML = '';
@@ -85,6 +89,41 @@ async function showResults() {
     }
 }
 
-document.getElementById('show').addEventListener('click', showResults);
-loadTokens();
-loadUnknownWords();
+document.getElementById('submit').addEventListener('click', showResults);
+
+async function loadAudio(name) {
+    const audio = document.getElementById('player');
+    const url = `/audio/${name}.wav`;
+    try {
+        const res = await fetch(url, { method: 'HEAD' });
+        if (res.ok) {
+            audio.src = url;
+            audio.style.display = 'block';
+        } else {
+            audio.removeAttribute('src');
+            audio.style.display = 'none';
+        }
+    } catch {
+        audio.removeAttribute('src');
+        audio.style.display = 'none';
+    }
+}
+
+async function loadStory(index) {
+    if (!stories.length) {
+        const res = await fetch('/stories_list');
+        stories = await res.json();
+    }
+    if (index < 0 || index >= stories.length) return;
+    currentIndex = index;
+    const name = stories[index];
+    document.getElementById('story-name').textContent = name;
+    await loadTokens(name);
+    await loadUnknownWords(name);
+    await loadAudio(name);
+}
+
+document.getElementById('prev').addEventListener('click', () => loadStory(currentIndex - 1));
+document.getElementById('next').addEventListener('click', () => loadStory(currentIndex + 1));
+
+loadStory(0);
