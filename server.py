@@ -6,11 +6,36 @@ import sqlite3
 import re
 import math
 import time
+from pathlib import Path
+from functools import lru_cache
 from flask import Flask, jsonify, request, send_from_directory
 from algo import WordPredictor
+from search_words import load_words, segment_text
 
 
 DB_PATH = "chinese_words.db"
+STORIES_DIR = Path("stories")
+
+@lru_cache
+def _word_list() -> list[str]:
+    return load_words(DB_PATH)
+
+@lru_cache
+def get_story_tokens(name: str) -> list[str]:
+    path = STORIES_DIR / f"{name}.txt"
+    if not path.exists():
+        return []
+    with open(path, "r", encoding="utf-8") as f:
+        text = f.read()
+    return segment_text(text, _word_list())
+
+def list_stories() -> list[str]:
+    stories = [p.stem for p in STORIES_DIR.glob("*.txt")]
+    def sort_key(s: str):
+        m = re.search(r"(\d+)", s)
+        return int(m.group(1)) if m else s
+    stories.sort(key=sort_key)
+    return stories
 
 app = Flask(__name__, static_url_path="", static_folder=".")
 
@@ -25,16 +50,20 @@ def text_page():
     return send_from_directory(".", "text.html")
 
 
-@app.route("/tokens.json")
-def tokens():
-    return send_from_directory(".", "tokens.json")
+@app.route("/story_tokens/<name>")
+def story_tokens(name: str):
+    """Return token list for the given story name (without extension)."""
+    return jsonify(get_story_tokens(name))
+
+@app.route("/stories_list")
+def stories_list_route():
+    return jsonify(list_stories())
 
 
-@app.route("/bopomofo_mapping")
-def bopomofo_mapping():
-    """Return a mapping from words in tokens.json to their bopomofo."""
-    with open("tokens.json", "r", encoding="utf-8") as f:
-        tokens = json.load(f)
+@app.route("/bopomofo_mapping/<name>")
+def bopomofo_mapping(name: str):
+    """Return a mapping from words in the given story to their bopomofo."""
+    tokens = get_story_tokens(name)
     chinese_re = re.compile(r"[\u4e00-\u9fff]+")
     words = {t for t in tokens if chinese_re.search(t)}
     if not words:
@@ -49,10 +78,9 @@ def bopomofo_mapping():
     return jsonify(mapping)
 
 
-@app.route("/unknown_words")
-def unknown_words():
-    with open("tokens.json", "r", encoding="utf-8") as f:
-        tokens = json.load(f)
+@app.route("/unknown_words/<name>")
+def unknown_words(name: str):
+    tokens = get_story_tokens(name)
     chinese_re = re.compile(r"[\u4e00-\u9fff]+")
     words = {t for t in tokens if chinese_re.search(t)}
     if not words:
